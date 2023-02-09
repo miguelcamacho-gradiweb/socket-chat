@@ -19,14 +19,17 @@ export const socketController = (socket ,io) => {
 
         //llamo a  todas las personas
         socket.broadcast.to(payload.sala).emit('listaPersonas', usuarios.getPersonasPorSalas(payload.sala))
+        socket.broadcast.to(payload.sala).emit('crearMensaje', crearMensaje('Administrador', `${payload.nombre} se unio`))
 
         callback(usuarios.getPersonasPorSalas(payload.sala))
     })
 
-    socket.on('crearMensaje',  (data)=>{
+    socket.on('crearMensaje',  (data, callback)=>{
         let persona = usuarios.getPersona( socket.id )
         let mensaje = crearMensaje( data.nombre, data.mensaje)
         socket.broadcast.to(persona.sala).emit('crearMensaje', mensaje)
+
+        callback(mensaje)
     })
 
     socket.on('disconnect', ()=>{
